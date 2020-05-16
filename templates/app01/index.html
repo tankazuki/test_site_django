@@ -7,7 +7,11 @@
 {% endif %}
 <h1>こんにちは</h1>
 {% if request.user.is_authenticated %}
-{{  request.user.username  }}
+<p>{{  request.user.username  }}</p>
+<p><a href="{% url 'logout' %}">ログアウト</a></p>
+{% else %}
+<p><a href="{% url 'app01:signup' %}">新規登録</a></p>
+<p><a href="{% url 'login' %}">ログイン</a></p>
 {% endif %}
 <p>これはテスト用のviewです</p>
 {% for memo in memo_list %}
@@ -27,5 +31,8 @@
     <table>
         {{ form }}
     </table>
-    <button type="submit" >送信</button>
+    <button type="submit"
+    {% if not request.user.is_authenticated %}
+            disabled
+            {% endif %}>送信</button>
 </form>

@@ -1,18 +1,12 @@
-from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponse, request, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-
-# Create your views here.
+from config import settings
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 
 from app01.forms import MemoForm, SignUpForm
 from app01.models import Memo
-
-
-def index(request):
-    return HttpResponse('aaaaaaaaaa')
 
 
 class ListMemoView(CreateView):
@@ -22,8 +16,7 @@ class ListMemoView(CreateView):
     success_url = reverse_lazy('app01:index')
 
     def form_valid(self, form):
-        if self.request.user:
-            form.instance.user = self.request.user
+        form.instance.user = self.request.user
         return super(ListMemoView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -45,6 +38,8 @@ class SignUpView(CreateView):
             username = form.cleaned_data.get('username')
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password1')
+            print('password_dubug')
+            print(password)
             user = authenticate(username=username, email=email, password=password)
             login(request, user)
             return redirect('/app01/')
@@ -56,10 +51,9 @@ class SignUpView(CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        login(self.request.user)
+        login(self.request, user)
         self.object = user
         return HttpResponseRedirect(self.get_success_url())
-
 
 
 
