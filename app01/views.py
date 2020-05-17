@@ -1,12 +1,12 @@
 from django.contrib.auth import authenticate, login
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from config import settings
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView
 
 from app01.forms import MemoForm, SignUpForm
-from app01.models import Memo
+from app01.models import Memo, Like
 
 
 class ListMemoView(CreateView):
@@ -56,6 +56,19 @@ class SignUpView(CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
+def add_like(request, pk):
+    memo = get_object_or_404(Memo, pk=pk)
+    user = request.user
+
+    if request.method == 'POST':
+        like = Like.objects.create(memo=memo, user=user)
+        like.save()
+        message = '登録に成功しました'
+        response = {
+            'count': Like.objects.filter(memo=memo).count(),
+            'message': message
+        }
+        return JsonResponse(response)
 
 
 

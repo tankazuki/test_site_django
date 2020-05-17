@@ -6,5 +6,6 @@ app_name = 'app01'
 urlpatterns = [
     path('', views.ListMemoView.as_view(), name='index'),
     path('memo/<int:pk>/', views.DetailMemoView.as_view(), name='detail'),
-    path('signup/', views.SignUpView.as_view(), name='signup')
+    path('signup/', views.SignUpView.as_view(), name='signup'),
+    path('memo/<int:pk>/like_ajax', views.add_like, name='like'),
 ]

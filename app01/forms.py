@@ -1,13 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
+from .models import User, Like
 from django.forms import EmailField
 
 from app01.models import Memo
 
 
 class MemoForm(forms.ModelForm):
-
 
     class Meta:
         model = Memo

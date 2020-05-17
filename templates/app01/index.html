@@ -1,3 +1,7 @@
+{% load static %}
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+<script src="{% static 'js/.jquery-3.5.1.js' %}"></script>
+
 {% if messages %}
     <ul>
         {% for message in messages %}
@@ -21,10 +25,18 @@
     </a>
     {% if memo.user %}
     {{ memo.user.username }}
-    {% else %}
-    ゲストユーザ
     {% endif %}
+
 </li>
+{% if ine_flag %}
+    <div id="like-on" class="on mt-5" data-href="{% url 'app01:like' pk=memo.pk %}">
+{% else %}
+    <div id="like-off" class="mt-5" data-href="{% url 'app01:like' pk=memo.pk %}">
+{% endif %}
+    <i class="far fa-thumbs-up"></i>
+    <span class="count">({{ count }})</span>
+    <span class="message"></span>
+</div>
 {% endfor %}
 <form method="POST" >
     {% csrf_token %}
@@ -34,5 +46,60 @@
     <button type="submit"
     {% if not request.user.is_authenticated %}
             disabled
-            {% endif %}>送信</button>
+            {% endif %}
+    >送信</button>
 </form>
+
+        <script>
+            $(document).ready(function () {
+    function getCookie(name) {
+    var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                 if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+});
+//ここまでおまじないと思って記述
+//以下Ajax
+$("#like-on").click(function (event) {
+    event.preventDefault();
+    let like = $(this);
+    $.ajax({
+        url: like.attr('data-href'),
+        method: 'POST',
+        timeout: 10000,
+        dataType: "json",
+    })
+    .done(function (data) {
+        $('#like-on').addClass('on')
+        $('.count').text('(' + data.count + ')' + ' ');
+        $('.message').text(data.msg)
+    })
+    .fail(function (data) {
+        alert("fail");
+    })
+});
+
+        </script>

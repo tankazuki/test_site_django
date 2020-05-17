@@ -16,6 +16,12 @@ class Memo(models.Model):
         return self.title
 
 
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    memo = models.ForeignKey(Memo, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
+
+
 class Manager(UserManager):
 
     use_in_migration = True
